@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Least privilege: this workflow only reads the repository.
+permissions:
+  contents: read
+
+# A newer push to the same branch or PR cancels the older, now-irrelevant run.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # Linux: the reference environment (same OS as mutation testing and Pages).
+        # Pinned so a runner-image migration can't be mistaken for a code change.
+        # Windows: the platform Bracketeer actually ships on.
+        os: [ubuntu-24.04, windows-latest]
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install pinned dev dependencies and the package
+        run: |
+          python -m pip install -r requirements-dev.txt
+          python -m pip install -e . --no-deps
+
+      - name: Lint with ruff
+        if: runner.os == 'Linux'
+        run: ruff check --output-format=github .
+
+      - name: Run tests with coverage
+        run: pytest --cov

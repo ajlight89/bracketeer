@@ -1,0 +1,3 @@
+# Mutation-testing tool, installed only on Linux (CI or WSL); mutmut needs fork().
+# Kept out of the dev extra because it cannot run on Windows.
+mutmut==3.8.0

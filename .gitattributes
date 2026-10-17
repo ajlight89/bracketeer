@@ -1,0 +1,17 @@
+# Normalize line endings in the repository. This overrides each developer's
+# core.autocrlf so Windows and the Linux CI runners see identical bytes.
+* text=auto eol=lf
+
+# Windows-only scripts keep CRLF.
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files: never touch line endings or try to diff them.
+*.png binary
+*.jpg binary
+*.ico binary
+*.exe binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary

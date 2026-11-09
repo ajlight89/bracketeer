@@ -1,0 +1,7 @@
+# Store text files with LF line endings, and check them out with LF too.
+# Windows tools default to CRLF; the Linux CI and tools expect LF.
+* text=auto eol=lf
+
+# Binary files must never be converted.
+*.png binary
+*.ico binary

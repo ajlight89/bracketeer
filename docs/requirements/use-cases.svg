@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 630" width="780" height="630" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14">
+  <title>Bracketeer use case diagram</title>
+  <defs>
+    <marker id="open-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#222" stroke-width="1.5"/>
+    </marker>
+  </defs>
+  <rect width="780" height="630" fill="#ffffff"/>
+  <rect x="190" y="40" width="570" height="570" fill="none" stroke="#222" stroke-width="1.5"/>
+  <text x="208" y="66" font-weight="bold" font-size="16" fill="#222">Bracketeer</text>
+  <g stroke="#222" stroke-width="2" fill="none">
+    <circle cx="80" cy="294" r="13"/>
+    <line x1="80" y1="307" x2="80" y2="350"/>
+    <line x1="56" y1="322" x2="104" y2="322"/>
+    <line x1="80" y1="350" x2="60" y2="380"/>
+    <line x1="80" y1="350" x2="100" y2="380"/>
+  </g>
+  <text x="80" y="402" text-anchor="middle" fill="#222">Organizer</text>
+  <line x1="106" y1="320" x2="255" y2="108" stroke="#222" stroke-width="1.2"/>
+  <line x1="106" y1="320" x2="255" y2="152" stroke="#222" stroke-width="1.2"/>
+  <line x1="106" y1="320" x2="255" y2="196" stroke="#222" stroke-width="1.2"/>
+  <line x1="106" y1="320" x2="255" y2="240" stroke="#222" stroke-width="1.2"/>
+  <line x1="106" y1="320" x2="255" y2="284" stroke="#222" stroke-width="1.2"/>
+  <line x1="106" y1="320" x2="255" y2="328" stroke="#222" stroke-width="1.2"/>
+  <line x1="106" y1="320" x2="255" y2="372" stroke="#222" stroke-width="1.2"/>
+  <line x1="106" y1="320" x2="255" y2="416" stroke="#222" stroke-width="1.2"/>
+  <line x1="106" y1="320" x2="255" y2="460" stroke="#222" stroke-width="1.2"/>
+  <line x1="106" y1="320" x2="255" y2="504" stroke="#222" stroke-width="1.2"/>
+  <line x1="106" y1="320" x2="255" y2="548" stroke="#222" stroke-width="1.2"/>
+  <ellipse cx="380" cy="108" rx="125" ry="19" fill="#f4f6fb" stroke="#222" stroke-width="1.5"/>
+  <text x="380" y="113" text-anchor="middle" fill="#222">Register players</text>
+  <ellipse cx="380" cy="152" rx="125" ry="19" fill="#f4f6fb" stroke="#222" stroke-width="1.5"/>
+  <text x="380" y="157" text-anchor="middle" fill="#222">Edit or remove a player</text>
+  <ellipse cx="380" cy="196" rx="125" ry="19" fill="#f4f6fb" stroke="#222" stroke-width="1.5"/>
+  <text x="380" y="201" text-anchor="middle" fill="#222">Seed players</text>
+  <ellipse cx="380" cy="240" rx="125" ry="19" fill="#f4f6fb" stroke="#222" stroke-width="1.5"/>
+  <text x="380" y="245" text-anchor="middle" fill="#222">Start a tournament</text>
+  <ellipse cx="380" cy="284" rx="125" ry="19" fill="#f4f6fb" stroke="#222" stroke-width="1.5"/>
+  <text x="380" y="289" text-anchor="middle" fill="#222">Enter a match result</text>
+  <ellipse cx="380" cy="328" rx="125" ry="19" fill="#f4f6fb" stroke="#222" stroke-width="1.5"/>
+  <text x="380" y="333" text-anchor="middle" fill="#222">Generate the next round</text>
+  <ellipse cx="380" cy="372" rx="125" ry="19" fill="#f4f6fb" stroke="#222" stroke-width="1.5"/>
+  <text x="380" y="377" text-anchor="middle" fill="#222">View the standings</text>
+  <ellipse cx="380" cy="416" rx="125" ry="19" fill="#f4f6fb" stroke="#222" stroke-width="1.5"/>
+  <text x="380" y="421" text-anchor="middle" fill="#222">Save a tournament</text>
+  <ellipse cx="380" cy="460" rx="125" ry="19" fill="#f4f6fb" stroke="#222" stroke-width="1.5"/>
+  <text x="380" y="465" text-anchor="middle" fill="#222">Open a saved tournament</text>
+  <ellipse cx="380" cy="504" rx="125" ry="19" fill="#f4f6fb" stroke="#222" stroke-width="1.5"/>
+  <text x="380" y="509" text-anchor="middle" fill="#222">Undo or redo (Could)</text>
+  <ellipse cx="380" cy="548" rx="125" ry="19" fill="#f4f6fb" stroke="#222" stroke-width="1.5"/>
+  <text x="380" y="553" text-anchor="middle" fill="#222">Export a web page (Could)</text>
+  <ellipse cx="650" cy="348" rx="92" ry="19" fill="#f4f6fb" stroke="#222" stroke-width="1.5"/>
+  <text x="650" y="353" text-anchor="middle" fill="#222">Record a forfeit</text>
+  <line x1="616" y1="330" x2="495" y2="293" stroke="#222" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#open-arrow)"/>
+  <text x="648" y="292" text-anchor="middle" font-style="italic" fill="#222">«extend»</text>
+  <text x="208" y="600" font-size="12" fill="#555">(Could) = built only after every Must story works</text>
+</svg>

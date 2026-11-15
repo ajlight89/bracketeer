@@ -181,7 +181,7 @@ class Tournament:
         """Work out the current standings from the results (US-09).
 
         They're calculated on every call, so they always match the results.
-        The format decides the order (Strategy Pattern).
+        The format decides the order (Strategy pattern).
         """
         return self.format.standings(self)
 

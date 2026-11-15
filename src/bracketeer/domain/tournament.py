@@ -17,7 +17,7 @@ from bracketeer.domain.errors import (
 from bracketeer.domain.formats.base import RoundPlan, TournamentFormat
 from bracketeer.domain.player import Player
 from bracketeer.domain.rounds import Match, Round
-from bracketeer.domain.standings import Standing, round_robin_standings
+from bracketeer.domain.standings import Standing
 from bracketeer.domain.values import (
     MatchId,
     PlayerId,
@@ -181,8 +181,9 @@ class Tournament:
         """Work out the current standings from the results (US-09).
 
         They're calculated on every call, so they always match the results.
+        The format decides the order (Strategy Pattern).
         """
-        return round_robin_standings(self.players, self._rounds)
+        return self.format.standings(self)
 
     def _is_seeded(self) -> bool:
         return any(player.seed is not None for player in self._players.values())

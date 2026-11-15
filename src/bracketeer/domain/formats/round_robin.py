@@ -6,6 +6,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from bracketeer.domain.formats.base import RoundPlan, TournamentFormat
+from bracketeer.domain.standings import Standing, round_robin_standings
 from bracketeer.domain.values import PlayerId
 
 if TYPE_CHECKING:
@@ -38,6 +39,10 @@ class RoundRobin(TournamentFormat):
     def next_round(self, tournament: Tournament) -> RoundPlan | None:
         """Return None: the whole schedule is planned at the start."""
         return None
+
+    def standings(self, tournament: Tournament) -> list[Standing]:
+        """Rank by match points, game differential, then seed (R-TB-2, R-TB-3)."""
+        return round_robin_standings(tournament.players, tournament.rounds)
 
 
 def _plan_round(slots: list[PlayerId | None]) -> RoundPlan:

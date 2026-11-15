@@ -38,7 +38,7 @@ Priorities use MoSCoW: **Must** (needed for v1.0), **Could** (built only after e
 **Not stories:**
 
 - AI-assisted seeding is a Won't for this release. Its requirements are written up as a proposal in [ai-smart-seeding.md](ai-smart-seeding.md).
-- The demo-data script serves the project presentation, not an organizer, so it is a task, not a story.
+- The demo-data script creates sample tournaments for the report and presentation screenshots, not for an organizer, so it is a task, not a story.
 
 ---
 

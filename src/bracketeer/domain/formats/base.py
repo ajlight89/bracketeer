@@ -7,6 +7,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, ClassVar
 
+from bracketeer.domain.standings import Standing
 from bracketeer.domain.values import PlayerId
 
 if TYPE_CHECKING:
@@ -43,3 +44,7 @@ class TournamentFormat(ABC):
     @abstractmethod
     def next_round(self, tournament: Tournament) -> RoundPlan | None:
         """Plan the next round, or return None if no round is added later."""
+
+    @abstractmethod
+    def standings(self, tournament: Tournament) -> list[Standing]:
+        """Rank every player from the results so far (R-TB-1)."""

@@ -6,15 +6,24 @@ from random import Random
 from bracketeer.domain.errors import (
     DuplicateNameError,
     InvalidRatingError,
+    InvalidResultError,
     InvalidSeedingError,
+    NotInMatchError,
     PlayerCountError,
     TournamentStartedError,
+    UnknownMatchError,
     UnknownPlayerError,
 )
 from bracketeer.domain.formats.base import RoundPlan, TournamentFormat
 from bracketeer.domain.player import Player
 from bracketeer.domain.rounds import Match, Round
-from bracketeer.domain.values import MatchId, PlayerId, PlayerName, is_non_negative_int
+from bracketeer.domain.values import (
+    MatchId,
+    PlayerId,
+    PlayerName,
+    Result,
+    is_non_negative_int,
+)
 
 MIN_PLAYERS = 2
 MAX_PLAYERS = 64
@@ -141,6 +150,32 @@ class Tournament:
             self._add_round(plan)
         self._started = True
 
+    def match(self, match_id: MatchId) -> Match:
+        """Return the match with this ID, or raise UnknownMatchError.
+
+        Matches are created when the tournament starts, so before that every
+        ID is unknown.
+        """
+        for round_ in self._rounds:
+            for match in round_.matches:
+                if match.id == match_id:
+                    return match
+        raise UnknownMatchError(f"There's no match with ID {match_id}.")
+
+    def record_result(self, match_id: MatchId, result: Result) -> None:
+        """Record a match's result, replacing any earlier one (US-07).
+
+        Every check runs before the match changes, so a rejected result
+        leaves the match as it was.
+        """
+        match = self.match(match_id)
+        self._check_result_fits(match, result)
+        match.result = result
+
+    def clear_result(self, match_id: MatchId) -> None:
+        """Remove a match's result, so the match is unplayed again (US-07 #7)."""
+        self.match(match_id).result = None
+
     def _is_seeded(self) -> bool:
         return any(player.seed is not None for player in self._players.values())
 
@@ -152,6 +187,21 @@ class Tournament:
         if self._started:
             raise TournamentStartedError(
                 "The tournament has already started (R-PL-4, R-SD-3)."
+            )
+
+    def _check_result_fits(self, match: Match, result: Result) -> None:
+        """Raise if the result breaks a rule for this match (R-RS-2, R-RS-5)."""
+        if result.is_draw() and not self.format.allows_draws:
+            raise InvalidResultError(
+                "This format needs a winner in every match, so equal scores "
+                "aren't allowed (R-RS-2)."
+            )
+        # Only a forfeit names a player; Result checks its own shape.
+        forfeiter = result.forfeited_by
+        if forfeiter is not None and not match.has_player(forfeiter):
+            raise NotInMatchError(
+                f"Player {forfeiter} isn't in match {match.id}; it's between "
+                f"players {match.player_a} and {match.player_b}."
             )
 
     def _add_round(self, plan: RoundPlan) -> None:

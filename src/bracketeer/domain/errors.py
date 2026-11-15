@@ -15,7 +15,11 @@ class InvalidNameError(DomainError):
 
 
 class InvalidResultError(DomainError):
-    """A result has the wrong shape or an invalid game score (R-RS-1, R-RS-5)."""
+    """A result can't be recorded as given (R-RS-1, R-RS-2, R-RS-5).
+
+    Its shape or game scores are invalid, or it's a draw in a format that
+    needs a winner.
+    """
 
 
 class DuplicateNameError(DomainError):
@@ -32,6 +36,10 @@ class InvalidRatingError(DomainError):
 
 class UnknownPlayerError(DomainError):
     """No player in the tournament has the given ID."""
+
+
+class UnknownMatchError(DomainError):
+    """No match in the tournament has the given ID."""
 
 
 class InvalidSeedingError(DomainError):

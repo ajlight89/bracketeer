@@ -4,14 +4,14 @@ Non-functional requirements (NFRs) describe **how well** Bracketeer must work, r
 
 The NFRs are grouped by the quality characteristics of the ISO/IEC 25010 product quality model. Each one has a **fit criterion**: a measurement or check that decides whether it passes. A requirement like "the app should be fast" can't be tested; "every action responds within 1 second with 64 players" can.
 
-**Reference machine:** the developer's Windows 11 computer. Timing checks use a 64-player tournament, the maximum allowed (R-PL-1 in [domain-rules.md](domain-rules.md)). If the demo runs on a different computer, the manual checks are repeated there first.
+**Reference machine:** the developer's Windows 11 computer. Timing checks use a 64-player tournament, the maximum allowed (R-PL-1 in [domain-rules.md](domain-rules.md)).
 
 ## Performance efficiency (PE)
 
 | ID       | Requirement                                                                                                                         | How it's verified                                    |
 | -------- | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | NFR-PE-1 | With 64 players, every action (starting, generating a round, entering a result, refreshing the standings) responds within 1 second. | Manual test checklist, using a 64-player demo file   |
-| NFR-PE-2 | The `.exe` shows its main window within 5 seconds of being opened.                                                                  | Manual check of each release build                   |
+| NFR-PE-2 | The `.exe` shows its main menu within 5 seconds of being opened.                                                                    | Manual check of each release build                   |
 
 ## Reliability (RE)
 
@@ -30,7 +30,7 @@ The NFRs are grouped by the quality characteristics of the ISO/IEC 25010 product
 | NFR-SE-2 | All user-entered text in an exported web page is escaped, so it is displayed as text and never run as code (cross-site scripting).                                                                                                                                                         | An automated test with a player named `<script>alert(1)</script>` (US-11 #3) |
 | NFR-SE-3 | Bracketeer makes no network connections. All data stays on the computer.                                                                                                                                                                                                                   | Code review: no networking modules are imported in `src/`           |
 | NFR-SE-4 | Opening a file never runs code from it. Files are read only as JSON data and every value is checked before use; Python's `pickle` and `eval` are never used on file contents.                                                                                                               | Code review; the tests for NFR-RE-2                                 |
-| NFR-SE-5 | Files are written only where the organizer chooses in a standard Save As dialog, which asks before overwriting. Bracketeer never builds a file path from text the user typed.                                                                                                               | Manual test checklist                                               |
+| NFR-SE-5 | Files are written only to the path the organizer enters when saving, and an existing file is replaced only after the organizer confirms. Bracketeer never builds a file path from other text, such as a tournament or player name.                                                        | Manual test checklist                                               |
 
 ## Interaction capability (usability) (US)
 
@@ -38,7 +38,7 @@ The NFRs are grouped by the quality characteristics of the ISO/IEC 25010 product
 | -------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
 | NFR-US-1 | A match result can be entered in three steps or fewer: select the match, type the scores, confirm.                 | Manual test checklist                            |
 | NFR-US-2 | Every rejected input shows a message that says what's wrong and how to fix it. Users never see a Python traceback. | Acceptance criteria tests; manual test checklist |
-| NFR-US-3 | Every screen is usable, without scrolling sideways, in a window of 1280 × 720 pixels.                              | Manual test checklist                            |
+| NFR-US-3 | Every menu and table fits in a terminal 80 characters wide (the usual default) without wrapping, even with 64 players and 40-character names. | Manual test checklist                            |
 | NFR-US-4 | Removing a player and overwriting a file ask for confirmation first.                                               | Manual test checklist                            |
 
 ## Flexibility (portability) (PO)
@@ -53,7 +53,7 @@ The NFRs are grouped by the quality characteristics of the ISO/IEC 25010 product
 
 | ID       | Requirement                                                                                                                                  | How it's verified                                                   |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| NFR-MA-1 | The domain layer (`src/bracketeer/domain/`) imports only standard-library modules that do no input or output: no GUI, file, or network code. | An automated test that inspects the domain modules' imports         |
+| NFR-MA-1 | The domain layer (`src/bracketeer/domain/`) imports only standard-library modules that do no input or output: no terminal, file, or network code. | An automated test that inspects the domain modules' imports         |
 | NFR-MA-2 | Every testable acceptance criterion of a Must story is covered by an automated test that names the story and criterion (for example, `US-01 #2`). | Review of the test names against the story list before each release |
 | NFR-MA-3 | `ruff check` and `ruff format --check` pass on every pull request.                                                                           | GitHub Actions                                                      |
 

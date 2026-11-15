@@ -1,1 +1,1 @@
-"""Bracketeer: a desktop app for organizing and running small gaming tournaments."""
+"""Bracketeer: a terminal app for organizing and running small gaming tournaments."""

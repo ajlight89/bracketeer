@@ -8,8 +8,11 @@ from bracketeer.domain.errors import (
     InvalidRatingError,
     InvalidResultError,
     InvalidSeedingError,
+    NoNextRoundError,
     NotInMatchError,
     PlayerCountError,
+    ResultLockedError,
+    RoundNotFinishedError,
     TournamentStartedError,
     UnknownMatchError,
     UnknownPlayerError,
@@ -170,12 +173,32 @@ class Tournament:
         leaves the match as it was.
         """
         match = self.match(match_id)
+        self._check_not_locked(match)
         self._check_result_fits(match, result)
         match.result = result
 
     def clear_result(self, match_id: MatchId) -> None:
         """Remove a match's result, so the match is unplayed again (US-07 #7)."""
-        self.match(match_id).result = None
+        match = self.match(match_id)
+        self._check_not_locked(match)
+        match.result = None
+
+    def generate_next_round(self) -> None:
+        """Add the format's next round once every result is in (R-RD-1).
+
+        Only single elimination adds rounds later; round robin plans every
+        round at the start, so it never has a next round to generate.
+        """
+        if not self._started:
+            raise NoNextRoundError("Start the tournament first.")
+        if not self._all_rounds_finished():
+            raise RoundNotFinishedError(
+                "Every match needs a result before the next round (R-RD-1)."
+            )
+        plan = self.format.next_round(self)
+        if plan is None:
+            raise NoNextRoundError("There's no next round to generate.")
+        self._add_round(plan)
 
     def standings(self) -> list[Standing]:
         """Work out the current standings from the results (US-09).
@@ -184,6 +207,15 @@ class Tournament:
         The format decides the order (Strategy pattern).
         """
         return self.format.standings(self)
+
+    def is_complete(self) -> bool:
+        """Return True once every result is in and no round follows (R-RD-4).
+
+        Like the standings, completion is worked out on every call, never stored.
+        """
+        if not self._started or not self._all_rounds_finished():
+            return False
+        return self.format.next_round(self) is None
 
     def _is_seeded(self) -> bool:
         return any(player.seed is not None for player in self._players.values())
@@ -212,6 +244,18 @@ class Tournament:
                 f"Player {forfeiter} isn't in match {match.id}; it's between "
                 f"players {match.player_a} and {match.player_b}."
             )
+
+    def _check_not_locked(self, match: Match) -> None:
+        """Raise if a later round depends on this match's result (R-RS-7)."""
+        # "in" compares with ==, which is identity for Match (eq=False).
+        if self.format.locks_results and match not in self._rounds[-1].matches:
+            raise ResultLockedError(
+                f"Match {match.id}'s result can't change because the next "
+                "round depends on it (R-RS-7)."
+            )
+
+    def _all_rounds_finished(self) -> bool:
+        return all(round_.is_finished() for round_ in self._rounds)
 
     def _add_round(self, plan: RoundPlan) -> None:
         """Turn a plan into a numbered Round with numbered Matches."""

@@ -52,3 +52,15 @@ class NotInMatchError(DomainError):
 
 class TournamentStartedError(DomainError):
     """The action isn't allowed once the tournament has started (R-PL-4, R-SD-3)."""
+
+
+class ResultLockedError(DomainError):
+    """A result can't change because a later round depends on it (R-RS-7)."""
+
+
+class RoundNotFinishedError(DomainError):
+    """The next round needs a result in every match so far (R-RD-1)."""
+
+
+class NoNextRoundError(DomainError):
+    """There's no round to generate: not started, or the format adds none."""

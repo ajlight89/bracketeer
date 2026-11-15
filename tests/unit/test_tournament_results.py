@@ -7,20 +7,10 @@ from bracketeer.domain.errors import (
     NotInMatchError,
     UnknownMatchError,
 )
-from bracketeer.domain.formats.round_robin import RoundRobin
+from bracketeer.domain.formats.single_elimination import SingleElimination
 from bracketeer.domain.rounds import DRAW_POINTS, LOSS_POINTS, WIN_POINTS
 from bracketeer.domain.tournament import Tournament
 from bracketeer.domain.values import Result, ResultKind
-
-
-class NoDrawFormat(RoundRobin):
-    """A test double: round robin pairings, but draws are banned (R-RS-2).
-
-    It lets the no-draw rule be tested on its own, without single elimination.
-    """
-
-    key = "no_draw_test"
-    allows_draws = False
 
 
 def start_with(tournament, *names):
@@ -42,8 +32,8 @@ def ana_vs_ben(tournament):
 
 @pytest.fixture
 def no_draw_match():
-    """Ana against Ben in a started tournament whose format bans draws."""
-    tournament = Tournament("Cup Night", NoDrawFormat())
+    """Ana against Ben in a started single elimination, which bans draws."""
+    tournament = Tournament("Cup Night", SingleElimination())
     ana, ben = start_with(tournament, "Ana", "Ben")
     return tournament, tournament.rounds[0].matches[0], ana, ben
 

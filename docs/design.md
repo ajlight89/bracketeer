@@ -123,7 +123,7 @@ classDiagram
     }
 
     class Standing {
-        <<planned>>
+        <<value object>>
         +player_id: PlayerId
         +rank: int
         +match_points: int
@@ -147,7 +147,7 @@ classDiagram
     Tournament ..> Standing : calculates
 ```
 
-In the diagram, a filled diamond is composition (the part belongs to exactly one whole), a hollow triangle is inheritance, and a dashed arrow means one class creates or returns the other. Methods in italics are abstract, and underlined methods belong to the class rather than an instance (`Result.played` and `Result.forfeit` build a new result). `generate_next_round`, `standings`, and `is_complete` are planned.
+In the diagram, a filled diamond is composition (the part belongs to exactly one whole), a hollow triangle is inheritance, and a dashed arrow means one class creates or returns the other. Methods in italics are abstract, and underlined methods belong to the class rather than an instance (`Result.played` and `Result.forfeit` build a new result). `generate_next_round` and `is_complete` are planned.
 
 ### Entities and value objects
 

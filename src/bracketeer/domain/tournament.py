@@ -17,6 +17,7 @@ from bracketeer.domain.errors import (
 from bracketeer.domain.formats.base import RoundPlan, TournamentFormat
 from bracketeer.domain.player import Player
 from bracketeer.domain.rounds import Match, Round
+from bracketeer.domain.standings import Standing, round_robin_standings
 from bracketeer.domain.values import (
     MatchId,
     PlayerId,
@@ -175,6 +176,13 @@ class Tournament:
     def clear_result(self, match_id: MatchId) -> None:
         """Remove a match's result, so the match is unplayed again (US-07 #7)."""
         self.match(match_id).result = None
+
+    def standings(self) -> list[Standing]:
+        """Work out the current standings from the results (US-09).
+
+        They're calculated on every call, so they always match the results.
+        """
+        return round_robin_standings(self.players, self._rounds)
 
     def _is_seeded(self) -> bool:
         return any(player.seed is not None for player in self._players.values())

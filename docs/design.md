@@ -170,17 +170,15 @@ Each tournament format plans rounds differently, but a tournament treats them al
 
 A format **answers questions and never changes the tournament**. `first_rounds()` returns `RoundPlan` objects (who plays whom, and who has a bye), and `Tournament` turns each plan into a numbered `Round` with numbered `Match` objects. Match numbers are therefore handed out in one place. `next_round()` plans a round that depends on results: single elimination pairs the winners, and round robin returns `None` because its whole schedule is planned at the start. `standings()` ranks the players: round robin by match points (R-TB-2), single elimination by the round each player was knocked out in (R-TB-4). `Tournament.standings()` simply asks its format, so it contains no checks for which format it has. A format also declares two rules as class attributes: `allows_draws` (R-RS-2) and `locks_results` (R-RS-7).
 
-Adding a format, such as double elimination later, means adding one new class. `Tournament` and the existing formats don't change, which is the open/closed principle: open for extension, closed for modification.
+Adding a format, such as double elimination later, means adding one new class and listing it in the format registry. `Tournament` and the existing formats don't change, which is the open/closed principle: open for extension, closed for modification.
+
+The **format registry** (`formats/registry.py`) lists every format under its `key`. A saved file stores only the key, and `format_for(key)` turns it back into a new format object. An unknown key raises `UnknownFormatError`, so a damaged file produces a message instead of a crash (NFR-RE-2).
 
 `TournamentFormat` is an abstract base class (`abc.ABC`), so a format class that forgets to define a required method fails as soon as it's created, rather than later when the method is called.
 
 ### Repository: saving tournaments
 
 `TournamentRepository` (in `persistence/`) is the only code that reads or writes tournament files. The rest of the app asks it to `save(tournament, path)` or `load(path)` and never deals with JSON directly. This keeps file handling out of the domain, and it means the save format could change (for example, to a database) without touching the rules or the interface.
-
-### Command: undo and redo (only if US-08 is built)
-
-Each undoable action would be an object with `execute()` and `undo()`. `execute()` remembers the previous value (such as the old result) before making the change, and `undo()` puts it back. A history object keeps an undo stack and a redo stack. Generating a single elimination round can't be undone, because it locks the earlier results (R-RS-7), so it clears the history.
 
 ## Saving a tournament
 
@@ -214,8 +212,8 @@ A tournament is saved as one JSON file. Only the facts are stored: the players, 
 ```
 
 - `format_version` lets a future version recognize older files and refuse newer ones (NFR-RE-3).
-- `format` stores the format's key; the format itself holds no data, so the key is enough to recreate it.
-- Opening a file treats it as untrusted input: every value is checked before a tournament is rebuilt from it, and anything invalid produces a message instead of a crash (NFR-RE-2, NFR-SE-4).
+- `format` stores the format's key; the format itself holds no data, so the key is enough to recreate it with `format_for` (see the format registry above).
+- Opening a file treats it as untrusted input. Each value's type is checked first. The tournament is then rebuilt by **replaying** it through `Tournament`'s public methods: add the players, seed them in the saved order, start, and for each round record its results and generate the next round, checking that each rebuilt round matches the saved one. Every domain rule is checked again on the way, so anything invalid, whether the file is damaged or was edited by hand, produces a message instead of a crash (NFR-RE-2, NFR-SE-4, decision 11 in [key-decisions.md](key-decisions.md)).
 - Saving writes a complete new file first and then replaces the old one, so a failed save never leaves a half-written file (NFR-RE-1).
 
 ## Sources
@@ -224,7 +222,6 @@ A tournament is saved as one JSON file. Only the facts are stored: the players, 
 - UML class diagram notation: https://www.uml-diagrams.org/class-diagrams-overview.html
 - Strategy pattern: https://refactoring.guru/design-patterns/strategy
 - Repository pattern (Martin Fowler): https://martinfowler.com/eaaCatalog/repository.html
-- Command pattern: https://refactoring.guru/design-patterns/command
 - Value objects (Martin Fowler): https://martinfowler.com/bliki/ValueObject.html
 - Aggregates (Martin Fowler): https://martinfowler.com/bliki/DDD_Aggregate.html
 - Python `abc` module: https://docs.python.org/3/library/abc.html

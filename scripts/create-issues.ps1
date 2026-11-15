@@ -48,18 +48,18 @@ $Tasks = @(
        Body = 'Look up a format by its key, and rebuild a started tournament from saved data.' }
     @{ Title = 'Save and open tournaments as JSON files'; Milestone = 'Working app'; Stories = @('US-10')
        Body = 'A TournamentRepository that saves and loads tournaments as JSON, validates files on load, and never leaves a half-written file. Includes round-trip tests.' }
-    @{ Title = 'GUI: Players, Matches, and Standings tabs and the File menu'; Milestone = 'Working app'; Stories = @('US-01', 'US-02', 'US-03', 'US-04', 'US-05', 'US-07', 'US-09', 'US-10')
-       Body = 'The Tkinter window: Players, Matches, and Standings tabs, dialogs, the File menu (New, Open, Save, Save As), and clear error messages.' }
+    @{ Title = 'Terminal interface: menus for players, matches, standings, and files'; Milestone = 'Working app'; Stories = @('US-01', 'US-02', 'US-03', 'US-04', 'US-05', 'US-07', 'US-09', 'US-10')
+       Body = 'The menu-driven terminal interface: menus for players, seeding, matches and results, standings, and files (New, Open, Save, Save As), with clear error messages.' }
     @{ Title = 'Package Bracketeer as a single .exe'; Milestone = 'Working app'; Stories = @('US-12')
        Body = 'Build a single-file Windows executable with PyInstaller and test it on a computer without Python.' }
     @{ Title = 'Demo data script and manual test checklist'; Milestone = 'Working app'; Stories = @()
-       Body = 'A script that creates sample tournaments for the demo, and a checklist for the requirements that are checked by hand.' }
+       Body = 'A script that creates sample tournaments for the report screenshots, and a checklist for the requirements that are checked by hand.' }
     @{ Title = 'Write the report'; Milestone = 'Delivery'; Stories = @()
-       Body = 'The project report (10 pages or less).' }
-    @{ Title = 'Prepare the presentation and demo'; Milestone = 'Delivery'; Stories = @()
-       Body = 'The slides, a rehearsed live demo, and a recorded backup of the demo.' }
+       Body = 'The project report, as a Word document.' }
+    @{ Title = 'Prepare the presentation'; Milestone = 'Delivery'; Stories = @()
+       Body = 'The slides, based on the report, with screenshots of Bracketeer running.' }
     @{ Title = 'Prepare the submission'; Milestone = 'Delivery'; Stories = @()
-       Body = 'Make the repository public with the v1.0.0 release, and build the submission zip.' }
+       Body = 'Check the v1.0.0 release and the report, and submit the report.' }
 )
 
 function Invoke-Gh {

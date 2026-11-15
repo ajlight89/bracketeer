@@ -1,6 +1,6 @@
 # Bracketeer
 
-A Windows desktop app for organizing and running small gaming tournaments, such
+A Windows terminal app for organizing and running small gaming tournaments, such
 as a game night or a school esports event. Register and seed players, run a round
 robin or single elimination tournament, enter results, and follow the standings.
 Tournaments are saved as files on your computer, so Bracketeer needs no server
@@ -12,6 +12,7 @@ Final project for CPTR 345 Software Engineering, Fall 2026.
 
 ## Features (v1.0)
 
+- A menu-driven terminal interface: choose an action by its number
 - Add, edit, and remove players, with an optional rating
 - Seed players manually, at random, or by rating
 - Round robin and single elimination formats

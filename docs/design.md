@@ -8,20 +8,20 @@ Bracketeer is split into layers. Each layer may use the layers below it, never t
 
 ```mermaid
 flowchart TD
-    ui["ui/<br/>Tkinter window, tabs, and dialogs"]
-    app["app/<br/>connects the window to the rules and to saving"]
+    cli["cli/<br/>menu-driven terminal interface"]
+    app["app/<br/>connects the menus to the rules and to saving"]
     persistence["persistence/<br/>saves and opens tournament files (JSON)"]
     domain["domain/<br/>tournament rules: players, seeding, formats, results, standings"]
-    ui --> app
+    cli --> app
     app --> persistence
     app --> domain
     persistence --> domain
 ```
 
-The most important rule is that **the domain layer depends on nothing else**. It does no input or output: no window, no files, no network (NFR-MA-1, checked by an automated test). This has three benefits:
+The most important rule is that **the domain layer depends on nothing else**. It does no input or output: no printing or reading what the user types, no files, no network (NFR-MA-1, checked by an automated test). This has three benefits:
 
-- The tournament rules can be tested quickly, without opening a window or touching a file.
-- The window or the save format can change without touching the rules.
+- The tournament rules can be tested quickly, without running the menus or touching a file.
+- The interface or the save format can change without touching the rules. Replacing a planned graphical window with a terminal interface changed only the top layer (see [key-decisions.md](key-decisions.md), decision 2).
 - Every rule is enforced in one place, whatever part of the app asks for a change.
 
 Two consequences follow. Randomness is passed into the domain as a `random.Random` object, so a test can fix its seed and get the same result every time. And the domain reports a broken rule by raising a subclass of `DomainError`; the app layer catches it and shows a plain-language message (NFR-US-2).

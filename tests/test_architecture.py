@@ -15,7 +15,7 @@ PACKAGE_DIR = Path(bracketeer.__file__).parent
 RELATIVE = "<relative import>"
 
 # The domain may import only these (an allow-list). Anything else, such as
-# os, time, sqlite3, tkinter, or jinja2, fails until it's reviewed and added.
+# os, json, pathlib, or socket, fails until it's reviewed and added.
 DOMAIN_ALLOWED = {
     "__future__",
     "abc",
@@ -31,7 +31,7 @@ DOMAIN_ALLOWED = {
 }
 
 # Lower layers must never import the layers above them (a deny-list).
-UPPER_LAYERS = {"bracketeer.app", "bracketeer.ui"}
+UPPER_LAYERS = {"bracketeer.app", "bracketeer.cli"}
 
 
 def modules_in(layer):

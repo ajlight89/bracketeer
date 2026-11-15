@@ -64,3 +64,7 @@ class RoundNotFinishedError(DomainError):
 
 class NoNextRoundError(DomainError):
     """There's no round to generate: not started, or the format adds none."""
+
+
+class UnknownFormatError(DomainError):
+    """No tournament format has the given key, as in a damaged file (NFR-RE-2)."""

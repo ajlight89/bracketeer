@@ -14,7 +14,7 @@ The diagram shows what the organizer can do with Bracketeer. Each use case maps 
 
 ## Story index
 
-Priorities use MoSCoW: **Must** (needed for v1.0), **Could** (built only after every Must works), and **Won't** (considered and deliberately left out of this release).
+Priorities use MoSCoW: **Must** (needed for v1.0), **Should** (important and planned for v1.0, but the release still works without it), **Could** (built only after every Must works), and **Won't** (considered and deliberately left out of this release).
 
 | ID    | Story                                    | Priority |
 | ----- | ---------------------------------------- | -------- |
@@ -25,10 +25,10 @@ Priorities use MoSCoW: **Must** (needed for v1.0), **Could** (built only after e
 | US-05 | Run a round robin tournament             | Must     |
 | US-06 | Run a Swiss tournament                   | Won't    |
 | US-07 | Enter a match result                     | Must     |
-| US-08 | Undo and redo                            | Could    |
+| US-08 | Undo and redo                            | Won't    |
 | US-09 | View the standings                       | Must     |
 | US-10 | Save and open a tournament               | Must     |
-| US-11 | Export a tournament as a web page        | Could    |
+| US-11 | Export a tournament as a web page        | Should   |
 | US-12 | Run Bracketeer without installing Python | Must     |
 | US-13 | Withdraw a player mid-tournament         | Won't    |
 | US-14 | Import players from a CSV file           | Won't    |
@@ -125,9 +125,11 @@ As an organizer, I want to enter each match's game score, or a forfeit when a pl
 
 ## US-08: Undo and redo
 
-**Priority:** Could
+**Priority:** Won't (this release)
 
 As an organizer, I want to undo and redo my changes during a tournament so that I can fix a mistake quickly.
+
+_Why not now:_ clearing a result and entering it again (US-07 #7) already fixes a mistake, so undo would be a second way to do the same thing. The acceptance criteria below are kept for a future release.
 
 1. **Given** I just entered a result, **when** I choose undo, **then** the match goes back to unplayed, and the standings return to what they were before.
 2. **Given** I just undid a result, **when** I choose redo, **then** the result and the standings are restored.
@@ -163,7 +165,7 @@ As an organizer, I want to save a tournament as a file on my computer so that I 
 
 ## US-11: Export a tournament as a web page
 
-**Priority:** Could
+**Priority:** Should
 
 As an organizer, I want to export a tournament as a web page so that I can share the bracket and standings with players.
 
@@ -211,7 +213,7 @@ _Why not now:_ it needs a second (losers') bracket and a grand final, which is a
 
 As an organizer, I want to publish an exported bracket at a public web address so that players can follow it without receiving a file.
 
-_Why not now:_ it depends on web export (US-11, a Could), and Bracketeer makes no network connections (NFR-SE-3). An exported file can still be shared like any other file.
+_Why not now:_ Bracketeer makes no network connections (NFR-SE-3), and an exported web page (US-11) can already be posted or shared like any other file.
 
 ## Sources
 

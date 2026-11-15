@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "bracketeer"
-version = "0.0.0"
+version = "0.1.0"
 description = "A Windows terminal app for organizing and running small gaming tournaments."
 readme = "README.md"
 requires-python = ">=3.12"

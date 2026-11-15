@@ -28,7 +28,7 @@ Two consequences follow. Randomness is passed into the domain as a `random.Rando
 
 ## Domain classes
 
-The UML class diagram below shows the domain layer. Classes marked `«planned»` are designed but not built yet.
+The UML class diagram below shows the domain layer.
 
 ```mermaid
 classDiagram
@@ -109,12 +109,11 @@ classDiagram
         +locks_results: bool
         +first_rounds(seeded)* list~RoundPlan~
         +next_round(tournament)* RoundPlan or None
+        +standings(tournament)* list~Standing~
     }
 
     class RoundRobin
-    class SingleElimination {
-        <<planned>>
-    }
+    class SingleElimination
 
     class RoundPlan {
         <<value object>>
@@ -144,10 +143,10 @@ classDiagram
     TournamentFormat <|-- RoundRobin
     TournamentFormat <|-- SingleElimination
     TournamentFormat ..> RoundPlan : returns
-    Tournament ..> Standing : calculates
+    TournamentFormat ..> Standing : calculates
 ```
 
-In the diagram, a filled diamond is composition (the part belongs to exactly one whole), a hollow triangle is inheritance, and a dashed arrow means one class creates or returns the other. Methods in italics are abstract, and underlined methods belong to the class rather than an instance (`Result.played` and `Result.forfeit` build a new result). `generate_next_round` and `is_complete` are planned.
+In the diagram, a filled diamond is composition (the part belongs to exactly one whole), a hollow triangle is inheritance, and a dashed arrow means one class creates or returns the other. Methods in italics are abstract, and underlined methods belong to the class rather than an instance (`Result.played` and `Result.forfeit` build a new result).
 
 ### Entities and value objects
 
@@ -169,7 +168,7 @@ Each tournament format plans rounds differently, but a tournament treats them al
 | Context           | `Tournament`, which holds a format and calls it without knowing which it is   |
 | Client            | The app layer, which picks a format when the organizer creates a tournament   |
 
-A format **answers questions and never changes the tournament**. `first_rounds()` returns `RoundPlan` objects (who plays whom, and who has a bye), and `Tournament` turns each plan into a numbered `Round` with numbered `Match` objects. Match numbers are therefore handed out in one place. A format also declares two rules as class attributes: `allows_draws` (R-RS-2) and `locks_results` (R-RS-7).
+A format **answers questions and never changes the tournament**. `first_rounds()` returns `RoundPlan` objects (who plays whom, and who has a bye), and `Tournament` turns each plan into a numbered `Round` with numbered `Match` objects. Match numbers are therefore handed out in one place. `next_round()` plans a round that depends on results: single elimination pairs the winners, and round robin returns `None` because its whole schedule is planned at the start. `standings()` ranks the players: round robin by match points (R-TB-2), single elimination by the round each player was knocked out in (R-TB-4). `Tournament.standings()` simply asks its format, so it contains no checks for which format it has. A format also declares two rules as class attributes: `allows_draws` (R-RS-2) and `locks_results` (R-RS-7).
 
 Adding a format, such as double elimination later, means adding one new class. `Tournament` and the existing formats don't change, which is the open/closed principle: open for extension, closed for modification.
 
@@ -177,7 +176,7 @@ Adding a format, such as double elimination later, means adding one new class. `
 
 ### Repository: saving tournaments
 
-`TournamentRepository` (in `persistence/`) is the only code that reads or writes tournament files. The rest of the app asks it to `save(tournament, path)` or `load(path)` and never deals with JSON directly. This keeps file handling out of the domain, and it means the save format could change (for example, to a database) without touching the rules or the window.
+`TournamentRepository` (in `persistence/`) is the only code that reads or writes tournament files. The rest of the app asks it to `save(tournament, path)` or `load(path)` and never deals with JSON directly. This keeps file handling out of the domain, and it means the save format could change (for example, to a database) without touching the rules or the interface.
 
 ### Command: undo and redo (only if US-08 is built)
 

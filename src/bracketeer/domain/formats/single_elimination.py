@@ -1,4 +1,4 @@
-"""The single elimination formmat: lose once and you're out (R-SE)."""
+"""The single elimination format: lose once and you're out (R-SE)."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 class SingleElimination(TournamentFormat):
-    """Single elimination with byes for the top seeds  (R-SE-1 to R-SE-4)."""
+    """Single elimination with byes for the top seeds (R-SE-1 to R-SE-4)."""
 
     key = "single_elimination"
     allows_draws = False  # R-RS-2

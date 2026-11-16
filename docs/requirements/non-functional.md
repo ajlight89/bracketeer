@@ -20,7 +20,7 @@ The NFRs are grouped by the quality characteristics of the ISO/IEC 25010 product
 | NFR-RE-1 | Saving never leaves a half-written file. The new file is written in full first and only then replaces the old one, so a failed save keeps the previous version. | An automated test that makes a save fail partway through |
 | NFR-RE-2 | Opening a damaged or unreadable file shows an error message, not a crash, and the file is never changed.                                                         | Automated tests that open truncated and invalid files     |
 | NFR-RE-3 | Every saved file records its format version. A file with an unknown version is refused with a message.                                                           | An automated test that opens a file with a future version |
-| NFR-RE-4 | Closing Bracketeer, starting a new tournament, or opening another file asks before discarding unsaved changes.                                                   | Manual test checklist                                     |
+| NFR-RE-4 | Closing Bracketeer, starting a new tournament, or opening another file asks before discarding unsaved changes.                                                   | Automated menu tests; manual test checklist |
 
 ## Security (SE)
 
@@ -30,7 +30,7 @@ The NFRs are grouped by the quality characteristics of the ISO/IEC 25010 product
 | NFR-SE-2 | All user-entered text in an exported web page is escaped, so it is displayed as text and never run as code (cross-site scripting).                                                                                                                                                         | An automated test with a player named `<script>alert(1)</script>` (US-11 #3) |
 | NFR-SE-3 | Bracketeer makes no network connections. All data stays on the computer.                                                                                                                                                                                                                   | Code review: no networking modules are imported in `src/`           |
 | NFR-SE-4 | Opening a file never runs code from it. Files are read only as JSON data and every value is checked before use; Python's `pickle` and `eval` are never used on file contents.                                                                                                               | Code review; the tests for NFR-RE-2                                 |
-| NFR-SE-5 | Files are written only to the path the organizer enters when saving, and an existing file is replaced only after the organizer confirms. Bracketeer never builds a file path from other text, such as a tournament or player name.                                                        | Manual test checklist                                               |
+| NFR-SE-5 | New files are written only inside the organizer's Bracketeer folder (`Documents\Bracketeer`), under a file name the organizer types or accepts. A name with a folder separator, a character Windows doesn't allow, or a name Windows reserves (such as `CON`) is refused, so a name can never point outside the folder. Saving a tournament that was opened from another folder writes back to that same file. An existing file is replaced only after the organizer confirms. | Automated tests of file names and the save prompt; manual test checklist |
 
 ## Interaction capability (usability) (US)
 
@@ -38,8 +38,8 @@ The NFRs are grouped by the quality characteristics of the ISO/IEC 25010 product
 | -------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
 | NFR-US-1 | A match result can be entered in three steps or fewer: select the match, type the scores, confirm.                 | Manual test checklist                            |
 | NFR-US-2 | Every rejected input shows a message that says what's wrong and how to fix it. Users never see a Python traceback. | Acceptance criteria tests; manual test checklist |
-| NFR-US-3 | Every menu and table fits in a terminal 80 characters wide (the usual default) without wrapping, even with 64 players and 40-character names. | Manual test checklist                            |
-| NFR-US-4 | Removing a player and overwriting a file ask for confirmation first.                                               | Manual test checklist                            |
+| NFR-US-3 | Every menu and table fits in a terminal 80 characters wide (the usual default) without wrapping, even with 64 players and 40-character names. | An automated test of every table; manual test checklist |
+| NFR-US-4 | Removing a player and overwriting a file ask for confirmation first.                                               | Automated menu tests; manual test checklist |
 
 ## Flexibility (portability) (PO)
 

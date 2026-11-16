@@ -178,11 +178,13 @@ The **format registry** (`formats/registry.py`) lists every format under its `ke
 
 ### Repository: saving tournaments
 
-`TournamentRepository` (in `persistence/`) is the only code that reads or writes tournament files. The rest of the app asks it to `save(tournament, path)` or `load(path)` and never deals with JSON directly. This keeps file handling out of the domain, and it means the save format could change (for example, to a database) without touching the rules or the interface.
+`TournamentRepository` (in `persistence/repository.py`) is the only code that reads or writes tournament files. The rest of the app asks it to `save(tournament, path)` or `load(path)` and never deals with JSON directly. This keeps file handling out of the domain, and it means the save format could change (for example, to a database) without touching the rules or the interface.
+
+Turning a `Tournament` into the file's data and back is kept in its own module, `persistence/save_format.py`, so it can be tested without touching any files. When a file can't be saved or opened, the repository raises `SaveFileError` with a plain-language message. `DamagedFileError` (not valid JSON, or not a valid tournament) and `NewerVersionError` are kinds of `SaveFileError`, so the interface catches one exception type for both actions (NFR-US-2).
 
 ## Saving a tournament
 
-A tournament is saved as one JSON file. Only the facts are stored: the players, their seeds, the rounds, and the results. Standings are recalculated when the file is opened. A shortened example:
+A tournament is saved as one JSON file with the extension `.bracketeer`. Only the facts are stored: the players, their seeds, the rounds, and the results. Standings are recalculated when the file is opened. A shortened example:
 
 ```json
 {
@@ -213,8 +215,10 @@ A tournament is saved as one JSON file. Only the facts are stored: the players, 
 
 - `format_version` lets a future version recognize older files and refuse newer ones (NFR-RE-3).
 - `format` stores the format's key; the format itself holds no data, so the key is enough to recreate it with `format_for` (see the format registry above).
+- A match with no result yet has `"result": null`. A forfeit is stored as `{ "kind": "forfeit", "forfeited_by": 2 }`.
 - Opening a file treats it as untrusted input. Each value's type is checked first. The tournament is then rebuilt by **replaying** it through `Tournament`'s public methods: add the players, seed them in the saved order, start, and for each round record its results and generate the next round, checking that each rebuilt round matches the saved one. Every domain rule is checked again on the way, so anything invalid, whether the file is damaged or was edited by hand, produces a message instead of a crash (NFR-RE-2, NFR-SE-4, decision 11 in [key-decisions.md](key-decisions.md)).
-- Saving writes a complete new file first and then replaces the old one, so a failed save never leaves a half-written file (NFR-RE-1).
+- Player IDs in the file only connect matches to players. Opening numbers the players 1, 2, 3, ... again, so a gap left by a player removed before the start disappears; everything else, including the standings, is unchanged.
+- Saving writes the complete file to a temporary file in the same folder, forces it onto the disk, and then replaces the old file in one step with `os.replace`. A failed save therefore leaves the previous version as it was and no half-written file (NFR-RE-1). Files are always written as UTF-8, whatever the computer's default encoding is, so names such as "Zoë" survive.
 
 ## Sources
 
@@ -226,3 +230,5 @@ A tournament is saved as one JSON file. Only the facts are stored: the players, 
 - Aggregates (Martin Fowler): https://martinfowler.com/bliki/DDD_Aggregate.html
 - Python `abc` module: https://docs.python.org/3/library/abc.html
 - Python `json` module: https://docs.python.org/3/library/json.html
+- Python `os.replace`: https://docs.python.org/3/library/os.html#os.replace
+- Python `tempfile.mkstemp`: https://docs.python.org/3/library/tempfile.html#tempfile.mkstemp

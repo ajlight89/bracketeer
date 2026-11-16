@@ -18,13 +18,13 @@ flowchart TD
     persistence --> domain
 ```
 
-The most important rule is that **the domain layer depends on nothing else**. It does no input or output: no printing or reading what the user types, no files, no network (NFR-MA-1, checked by an automated test). This has three benefits:
+The most important rule is that **the domain layer depends on nothing else**. It does no input or output: no printing or reading what the user types, no files, no network (NFR-MA-1). An automated test reads every module's imports and checks the whole rule: the domain imports only safe standard-library modules, persistence never imports the layers above it, the app layer never imports the interface, and the interface imports only the app layer. This has three benefits:
 
 - The tournament rules can be tested quickly, without running the menus or touching a file.
 - The interface or the save format can change without touching the rules. Replacing a planned graphical window with a terminal interface changed only the top layer (see [key-decisions.md](key-decisions.md), decision 2).
 - Every rule is enforced in one place, whatever part of the app asks for a change.
 
-Two consequences follow. Randomness is passed into the domain as a `random.Random` object, so a test can fix its seed and get the same result every time. And the domain reports a broken rule by raising a subclass of `DomainError`; the app layer catches it and shows a plain-language message (NFR-US-2).
+Two consequences follow. Randomness is passed into the domain as a `random.Random` object, so a test can fix its seed and get the same result every time. And the domain reports a broken rule by raising a subclass of `DomainError`; the app layer turns it into a plain-language message that the interface shows (NFR-US-2, see [The app layer and the interface](#the-app-layer-and-the-interface)).
 
 ## Domain classes
 
@@ -184,7 +184,7 @@ Turning a `Tournament` into the file's data and back is kept in its own module, 
 
 ## Saving a tournament
 
-A tournament is saved as one JSON file with the extension `.bracketeer`. Only the facts are stored: the players, their seeds, the rounds, and the results. Standings are recalculated when the file is opened. A shortened example:
+A tournament is saved as one JSON file with the extension `.bracketeer`, normally in the organizer's `Documents\Bracketeer` folder. Only the facts are stored: the players, their seeds, the rounds, and the results. Standings are recalculated when the file is opened. A shortened example:
 
 ```json
 {
@@ -220,6 +220,22 @@ A tournament is saved as one JSON file with the extension `.bracketeer`. Only th
 - Player IDs in the file only connect matches to players. Opening numbers the players 1, 2, 3, ... again, so a gap left by a player removed before the start disappears; everything else, including the standings, is unchanged.
 - Saving writes the complete file to a temporary file in the same folder, forces it onto the disk, and then replaces the old file in one step with `os.replace`. A failed save therefore leaves the previous version as it was and no half-written file (NFR-RE-1). Files are always written as UTF-8, whatever the computer's default encoding is, so names such as "Zoë" survive.
 
+## The app layer and the interface
+
+`TournamentSession` (in `app/session.py`) holds the open tournament, the file it was last saved to, the folder where tournaments are kept, and whether it has unsaved changes. The menus read `session.tournament` to show the players, rounds, and standings, but every change goes through a session method, such as `add_player` or `record_score`. Each method that succeeds marks the session as having unsaved changes, so quitting, starting a new tournament, or opening another file asks first (NFR-RE-4, US-10 #2).
+
+When a rule is broken, or a file can't be saved or opened, the session raises `ActionError` with a plain-language message. The rule IDs at the end of domain messages, such as "(R-RS-7)", help developers and tests but mean nothing to an organizer, so they are removed. The menus catch this one exception type, show the message, and carry on, so the organizer never sees a traceback (NFR-US-2).
+
+The interface (`cli/`) is a set of numbered menus:
+
+- The main menu changes with the tournament's state. Before the start it offers Players, Seeding, and Start the tournament; after the start, Matches and results, Standings, and Players (to correct a name). Save, New tournament, Open a tournament, and Quit are always there, and Save as appears once the tournament has a file.
+- Players and matches are chosen by their number in the table on screen, so the organizer never needs to know an ID.
+- A result takes three steps: choose the match, type the scores (such as `2-1`) or `F` for a forfeit, and press Enter (NFR-US-1). The matches screen shows one round at a time, with Next round and Previous round to move between them. Round robin's whole schedule is planned at the start, so its heading says "Round 2 of 5" and Next round shows the next planned round. Single elimination instead offers "Generate the next round" once every result is in, because its pairings depend on the results.
+- Tournaments are kept in one folder, `Documents\Bracketeer`, created by the first save (decision 12 in [key-decisions.md](key-decisions.md)). Open lists the files in it, newest first, so the organizer never types a path (US-10 #3); a last choice opens a file from another folder by its path. Save asks only for a file name and suggests the tournament's name, with any characters Windows doesn't allow removed. A typed name with a folder separator, a disallowed character, or a name Windows reserves is refused, so a file is never written outside the folder, and an existing file is replaced only after the organizer confirms (NFR-SE-5).
+- Tables fit a terminal 80 characters wide (NFR-US-3). In a match line, each name is cut to 30 characters and ends with "…" if it was longer. A test builds every table with 64 players and 40-character names and checks the width of each line.
+
+`Console` (in `cli/console.py`) is the only code that reads the keyboard or prints. Tests pass in a scripted console that answers each prompt from a list and records everything shown, so the menus are tested end to end without anyone typing (`tests/cli/`).
+
 ## Sources
 
 - Mermaid class diagrams: https://mermaid.js.org/syntax/classDiagram.html
@@ -232,3 +248,7 @@ A tournament is saved as one JSON file with the extension `.bracketeer`. Only th
 - Python `json` module: https://docs.python.org/3/library/json.html
 - Python `os.replace`: https://docs.python.org/3/library/os.html#os.replace
 - Python `tempfile.mkstemp`: https://docs.python.org/3/library/tempfile.html#tempfile.mkstemp
+- Python `input`: https://docs.python.org/3/library/functions.html#input
+- Python `contextlib.contextmanager`: https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager
+- Python `textwrap`: https://docs.python.org/3/library/textwrap.html
+- Windows file naming rules (reserved names and characters): https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file

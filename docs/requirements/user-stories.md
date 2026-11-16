@@ -159,7 +159,7 @@ As an organizer, I want to save a tournament as a file on my computer so that I 
 
 1. **Given** a tournament in progress, **when** I save it, close Bracketeer, and open the file again, **then** the players, seeds, rounds, results, and standings are exactly as I left them.
 2. **Given** a tournament with unsaved changes, **when** I close Bracketeer, start a new tournament, or open another file, **then** I'm asked whether to save first (NFR-RE-4).
-3. **Given** I choose Open, **then** I'm asked for the file's path, and pressing Enter without typing one returns to the menu with nothing changed.
+3. **Given** I choose Open, **then** I see a numbered list of the tournaments saved in my Bracketeer folder, newest first, and choosing 0 returns to the menu with nothing changed. A file in another folder can still be opened by typing its path.
 4. **Given** a damaged or unreadable file, **when** I open it, **then** I see an error message, Bracketeer doesn't crash, and the file isn't changed (NFR-RE-2).
 5. **Given** a file saved by a newer version of Bracketeer, **when** I open it, **then** it's refused with a message (NFR-RE-3).
 
@@ -172,7 +172,7 @@ As an organizer, I want to export a tournament as a web page so that I can share
 1. **Given** a tournament, **when** I export it and choose where to save it, **then** a single HTML file is created there, showing the rounds, results, and standings.
 2. **Given** an exported file, **when** I open it in a web browser without an internet connection, **then** it displays correctly (NFR-PO-3).
 3. **Given** a player named `<script>alert(1)</script>`, **when** I export and open the page, **then** the name appears as plain text, and no script runs (NFR-SE-2).
-4. **Given** I choose Export, **then** I'm asked for a path, and the file is written only there (NFR-SE-5).
+4. **Given** I choose Export, **then** I'm asked for a file name, and the page is written only to my Bracketeer folder under that name (NFR-SE-5).
 
 ## US-12: Run Bracketeer without installing Python
 

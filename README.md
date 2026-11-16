@@ -48,6 +48,16 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
 
+Then start Bracketeer:
+
+```powershell
+python -m bracketeer
+```
+
+Choose each action by typing its number and pressing Enter. Tournaments are saved
+as `.bracketeer` files in a `Bracketeer` folder in your Documents, and Open lists
+them for you to choose from.
+
 ## Running the tests
 
 With the virtual environment active:

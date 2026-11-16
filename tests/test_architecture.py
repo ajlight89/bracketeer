@@ -1,4 +1,4 @@
-"""Architecture tests: enforce the dependency rule (NFR-MA-1).
+"""Architecture tests: enforce the layers' dependency rule (NFR-MA-1, design.md).
 
 These tests read the source code without running it. They parse each module
 with the ast module and check what it imports.
@@ -33,6 +33,9 @@ DOMAIN_ALLOWED = {
 # Lower layers must never import the layers above them (a deny-list).
 UPPER_LAYERS = {"bracketeer.app", "bracketeer.cli"}
 
+# The interface reaches the rules and saving only through the app layer.
+INTERFACE_ALLOWED = {"bracketeer.app", "bracketeer.cli"}
+
 
 def modules_in(layer):
     """Return every .py file in a layer folder, such as 'domain'."""
@@ -65,6 +68,8 @@ def short_name(path):
 
 DOMAIN_FILES = modules_in("domain")
 LOWER_FILES = modules_in("persistence") + modules_in("export")
+APP_FILES = modules_in("app")
+CLI_FILES = modules_in("cli")
 
 
 def test_checker_finds_every_kind_of_import(tmp_path):
@@ -92,5 +97,26 @@ def test_lower_layers_never_import_upper_layers(path):
         name
         for name in imports_in(path)
         if name == RELATIVE or is_within(name, UPPER_LAYERS)
+    }
+    assert not bad, f"{short_name(path)} imports {sorted(bad)}"
+
+
+@pytest.mark.parametrize("path", APP_FILES, ids=short_name)
+def test_app_layer_never_imports_the_interface(path):
+    bad = {
+        name
+        for name in imports_in(path)
+        if name == RELATIVE or is_within(name, {"bracketeer.cli"})
+    }
+    assert not bad, f"{short_name(path)} imports {sorted(bad)}"
+
+
+@pytest.mark.parametrize("path", CLI_FILES, ids=short_name)
+def test_interface_imports_only_the_app_layer(path):
+    bad = {
+        name
+        for name in imports_in(path)
+        if name == RELATIVE
+        or (is_within(name, {"bracketeer"}) and not is_within(name, INTERFACE_ALLOWED))
     }
     assert not bad, f"{short_name(path)} imports {sorted(bad)}"

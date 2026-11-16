@@ -218,3 +218,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Bracketeer: tournaments saved while trying out the app
+*.bracketeer

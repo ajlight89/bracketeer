@@ -11,14 +11,17 @@ flowchart TD
     cli["cli/<br/>menu-driven terminal interface"]
     app["app/<br/>connects the menus to the rules and to saving"]
     persistence["persistence/<br/>saves and opens tournament files (JSON)"]
+    export["export/<br/>writes a tournament as a web page (HTML)"]
     domain["domain/<br/>tournament rules: players, seeding, formats, results, standings"]
     cli --> app
     app --> persistence
+    app --> export
     app --> domain
     persistence --> domain
+    export --> domain
 ```
 
-The most important rule is that **the domain layer depends on nothing else**. It does no input or output: no printing or reading what the user types, no files, no network (NFR-MA-1). An automated test reads every module's imports and checks the whole rule: the domain imports only safe standard-library modules, persistence never imports the layers above it, the app layer never imports the interface, and the interface imports only the app layer. This has three benefits:
+The most important rule is that **the domain layer depends on nothing else**. It does no input or output: no printing or reading what the user types, no files, no network (NFR-MA-1). An automated test reads every module's imports and checks the whole rule: the domain imports only safe standard-library modules, persistence and export never import the layers above them, the app layer never imports the interface, and the interface imports only the app layer. This has three benefits:
 
 - The tournament rules can be tested quickly, without running the menus or touching a file.
 - The interface or the save format can change without touching the rules. Replacing a planned graphical window with a terminal interface changed only the top layer (see [key-decisions.md](key-decisions.md), decision 2).
@@ -228,13 +231,22 @@ When a rule is broken, or a file can't be saved or opened, the session raises `A
 
 The interface (`cli/`) is a set of numbered menus:
 
-- The main menu changes with the tournament's state. Before the start it offers Players, Seeding, and Start the tournament; after the start, Matches and results, Standings, and Players (to correct a name). Save, New tournament, Open a tournament, and Quit are always there, and Save as appears once the tournament has a file.
+- The main menu changes with the tournament's state. Before the start it offers Players, Seeding, and Start the tournament; after the start, Matches and results, Standings, Players (to correct a name), and Export as a web page. Save, New tournament, Open a tournament, and Quit are always there, and Save as appears once the tournament has a file.
 - Players and matches are chosen by their number in the table on screen, so the organizer never needs to know an ID.
 - A result takes three steps: choose the match, type the scores (such as `2-1`) or `F` for a forfeit, and press Enter (NFR-US-1). The matches screen shows one round at a time, with Next round and Previous round to move between them. Round robin's whole schedule is planned at the start, so its heading says "Round 2 of 5" and Next round shows the next planned round. Single elimination instead offers "Generate the next round" once every result is in, because its pairings depend on the results.
 - Tournaments are kept in one folder, `Documents\Bracketeer`, created by the first save (decision 12 in [key-decisions.md](key-decisions.md)). Open lists the files in it, newest first, so the organizer never types a path (US-10 #3); a last choice opens a file from another folder by its path. Save asks only for a file name and suggests the tournament's name, with any characters Windows doesn't allow removed. A typed name with a folder separator, a disallowed character, or a name Windows reserves is refused, so a file is never written outside the folder, and an existing file is replaced only after the organizer confirms (NFR-SE-5).
 - Tables fit a terminal 80 characters wide (NFR-US-3). In a match line, each name is cut to 30 characters and ends with "…" if it was longer. A test builds every table with 64 players and 40-character names and checks the width of each line.
 
 `Console` (in `cli/console.py`) is the only code that reads the keyboard or prints. Tests pass in a scripted console that answers each prompt from a list and records everything shown, so the menus are tested end to end without anyone typing (`tests/cli/`).
+
+## Exporting a web page
+
+Export as a web page (US-11) writes the tournament as one HTML file: a summary line, the champion once the tournament is complete, the standings, and every round's matches and byes. It asks for a file name in the same way as Save, with the same rules, and writes `<name>.html` into the Bracketeer folder, asking before it replaces a page (US-11 #4, NFR-SE-5). It then shows the full path, so the organizer can find the file and send or post it. Exporting doesn't change the tournament, so it doesn't count as an unsaved change.
+
+- The page is **self-contained**: its styles are inside the file, and it has no scripts, images, or links to other files or websites, so it displays the same offline (NFR-PO-3). A test checks the page for anything that would load something from outside, such as `src=`, `href=`, or `url(`.
+- **Every name is escaped.** Tournament and player names are typed by the organizer, so the export treats them as untrusted. Each one goes through Python's `html.escape`, which turns `<`, `>`, `&`, and quotes into character references, so the browser shows them as text instead of reading them as markup (cross-site scripting prevention, NFR-SE-2). All player names come from one helper, `_name()`, so there is one place to get right. A test exports a player named `<script>alert(1)</script>` and reads the page with Python's `html.parser`, the way a browser would: there is no `script` tag, and the exact name appears as text.
+- `web_page()` only builds the text of the page, and the time of the export is passed in, so tests compare pages without touching files or the clock. `write_web_page()` writes it as UTF-8.
+- The page is built with the standard library rather than a template engine (decision 13 in [key-decisions.md](key-decisions.md)).
 
 ## Sources
 
@@ -252,3 +264,6 @@ The interface (`cli/`) is a set of numbered menus:
 - Python `contextlib.contextmanager`: https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager
 - Python `textwrap`: https://docs.python.org/3/library/textwrap.html
 - Windows file naming rules (reserved names and characters): https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
+- Python `html.escape`: https://docs.python.org/3/library/html.html#html.escape
+- Python `html.parser`: https://docs.python.org/3/library/html.parser.html
+- OWASP Cross Site Scripting Prevention Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html

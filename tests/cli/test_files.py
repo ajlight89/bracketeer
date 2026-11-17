@@ -8,6 +8,7 @@ from bracketeer.app.session import TournamentSession
 from bracketeer.cli.files import (
     ask_path,
     clean_name,
+    export_web_page,
     name_problem,
     save,
     save_as,
@@ -249,3 +250,51 @@ def test_us_10_2_new_and_open_ask_before_discarding(script, league, choice):
     run(console, league)
     assert league.tournament.name == "Friday Smash Night"
     assert console.screen.count("The tournament has unsaved changes.") == 2
+
+
+# Exporting a web page (US-11 #4)
+
+
+def test_us_11_4_export_suggests_the_tournament_name_in_the_folder(script, cup, folder):
+    console = script("")
+    assert export_web_page(console, cup)
+    page = folder / "Cup Night.html"
+    assert page.exists()
+    assert f"Exported to {page}." in console.screen
+    assert "Open it in a web browser" in console.screen
+
+
+def test_us_11_4_export_refuses_a_name_that_leaves_the_folder(script, cup, folder):
+    console = script("..\\results", "results.html")
+    assert export_web_page(console, cup)
+    assert "can't contain" in console.screen
+    assert sorted(path.name for path in folder.iterdir()) == ["results.html"]
+
+
+def test_us_11_4_an_existing_page_is_replaced_only_after_confirming(
+    script, cup, folder
+):
+    existing = saved_file(folder, "cup.html", 5, text="keep me")
+    assert not export_web_page(script("cup", "n"), cup)
+    assert existing.read_text(encoding="utf-8") == "keep me"
+    assert export_web_page(script("cup", "y"), cup)
+    assert "Cup Night" in existing.read_text(encoding="utf-8")
+
+
+def test_typing_0_cancels_exporting(script, cup, folder):
+    assert not export_web_page(script("0"), cup)
+    assert not folder.exists()
+
+
+def test_exporting_keeps_the_tournament_and_its_unsaved_changes_flag(script, cup):
+    assert cup.has_unsaved_changes
+    export_web_page(script(""), cup)
+    assert cup.has_unsaved_changes
+    assert cup.path is None
+
+
+def test_a_page_that_cant_be_written_shows_a_message(script, cup, folder):
+    (folder / "cup.html").mkdir(parents=True)  # a folder where the file should go
+    console = script("cup", "y")
+    assert not export_web_page(console, cup)
+    assert "Error: Couldn't export to" in console.screen

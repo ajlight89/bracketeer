@@ -3,6 +3,7 @@
 import re
 from collections.abc import Generator
 from contextlib import contextmanager
+from datetime import datetime
 from pathlib import Path
 from random import Random
 
@@ -11,6 +12,7 @@ from bracketeer.domain.formats.registry import format_for
 from bracketeer.domain.player import Player
 from bracketeer.domain.tournament import Tournament
 from bracketeer.domain.values import MatchId, PlayerId, Result
+from bracketeer.export.web_page import write_web_page
 from bracketeer.persistence.errors import SaveFileError
 from bracketeer.persistence.repository import TournamentRepository
 
@@ -82,6 +84,21 @@ class TournamentSession:
             self._repository.save(tournament, path)
         self.path = path
         self.has_unsaved_changes = False
+
+    def export_web_page(self, path: Path) -> None:
+        """Write the tournament as a single web page to path (US-11).
+
+        Exporting doesn't change the tournament, so it doesn't count as an
+        unsaved change.
+        """
+        tournament = self._current()
+        if not tournament.started:
+            raise ActionError("Start the tournament before exporting it.")
+        try:
+            write_web_page(tournament, path, datetime.now())
+        except OSError as error:
+            reason = error.strerror or error
+            raise ActionError(f"Couldn't export to {path}: {reason}.") from error
 
     def add_player(self, name: str, rating: int | None) -> PlayerId:
         with self._changing() as tournament:

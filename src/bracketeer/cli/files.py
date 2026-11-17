@@ -1,8 +1,8 @@
-"""File actions: new, open, save, and save as (US-10).
+"""File actions: new, open, save, save as (US-10), and export (US-11).
 
 Tournaments are kept in one folder (session.folder, normally
-Documents\\Bracketeer). Open lists the files in it, and Save asks only for a
-file name, so the organizer never has to type a path. Every action that would
+Documents\\Bracketeer). Open lists the files in it, and Save and Export ask
+only for a file name, so the organizer never has to type a path. Every action that would
 replace the open tournament first asks what to do with unsaved changes
 (NFR-RE-4).
 """
@@ -15,6 +15,7 @@ from bracketeer.cli.console import Console, ask_yes_no, choose, heading, show_er
 from bracketeer.cli.tables import FORMAT_NAMES, fit
 
 FILE_EXTENSION = ".bracketeer"
+WEB_PAGE_EXTENSION = ".html"
 MAX_FILE_NAME_LENGTH = 40
 FALLBACK_NAME = "tournament"
 
@@ -115,7 +116,34 @@ def save_as(console: Console, session: TournamentSession) -> bool:
     return _save_to(console, session, path)
 
 
-def ask_file_name(console: Console, session: TournamentSession) -> Path | None:
+def export_web_page(console: Console, session: TournamentSession) -> bool:
+    """Write the tournament as a web page in the folder (US-11).
+
+    Return True if the page was written. Like Save as, it asks for a file name
+    and replaces an existing page only after the organizer confirms.
+    """
+    path = ask_file_name(console, session, WEB_PAGE_EXTENSION)
+    if path is None:
+        return False
+    if path.exists() and not ask_yes_no(
+        console, f"{path.name} already exists. Replace it?"
+    ):
+        return False
+    if not _make_folder(console, path.parent):
+        return False
+    try:
+        session.export_web_page(path)
+    except ActionError as error:
+        show_error(console, error)
+        return False
+    console.say(f"Exported to {path}.")
+    console.say("Open it in a web browser, or send the file to the players.")
+    return True
+
+
+def ask_file_name(
+    console: Console, session: TournamentSession, extension: str = FILE_EXTENSION
+) -> Path | None:
     """Ask for a file name in the folder; Enter takes the suggested name.
 
     The suggestion is the tournament's name with any characters Windows
@@ -126,10 +154,10 @@ def ask_file_name(console: Console, session: TournamentSession) -> Path | None:
         answer = console.ask(f"File name (Enter for {suggestion}, 0 to cancel): ")
         if answer == "0":
             return None
-        name = clean_name(answer or suggestion)
+        name = clean_name(answer or suggestion, extension)
         problem = name_problem(name)
         if problem is None:
-            return session.folder / f"{name}{FILE_EXTENSION}"
+            return session.folder / f"{name}{extension}"
         console.say(problem)
 
 
@@ -144,11 +172,11 @@ def suggested_name(tournament_name: str) -> str:
     return FALLBACK_NAME if name_problem(name) else name
 
 
-def clean_name(text: str) -> str:
-    """Drop a typed .bracketeer and the spaces and dots Windows ignores at the end."""
+def clean_name(text: str, extension: str = FILE_EXTENSION) -> str:
+    """Drop a typed extension and the spaces and dots Windows ignores at the end."""
     name = text.strip()
-    if name.lower().endswith(FILE_EXTENSION):
-        name = name[: -len(FILE_EXTENSION)]
+    if name.lower().endswith(extension):
+        name = name[: -len(extension)]
     return name.rstrip(". ")
 
 
@@ -202,11 +230,7 @@ def ask_path(console: Console, prompt: str) -> Path | None:
 
 def _save_to(console: Console, session: TournamentSession, path: Path) -> bool:
     """Save, creating the folder the first time. Return True if saved."""
-    try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-    except OSError as error:
-        reason = error.strerror or error
-        show_error(console, f"Couldn't create the folder {path.parent}: {reason}.")
+    if not _make_folder(console, path.parent):
         return False
     try:
         session.save(path)
@@ -214,4 +238,15 @@ def _save_to(console: Console, session: TournamentSession, path: Path) -> bool:
         show_error(console, error)
         return False
     console.say(f"Saved to {path}.")
+    return True
+
+
+def _make_folder(console: Console, folder: Path) -> bool:
+    """Create the folder if it's missing. Return False, with a message, if it can't."""
+    try:
+        folder.mkdir(parents=True, exist_ok=True)
+    except OSError as error:
+        reason = error.strerror or error
+        show_error(console, f"Couldn't create the folder {folder}: {reason}.")
+        return False
     return True

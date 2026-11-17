@@ -20,6 +20,7 @@ from bracketeer.cli.console import (
     show_error,
 )
 from bracketeer.cli.files import (
+    export_web_page,
     new_tournament,
     ok_to_discard,
     open_tournament,
@@ -89,6 +90,7 @@ def main_actions(session: TournamentSession) -> list[tuple[str, Action]]:
             actions.append(("Matches and results", matches_menu))
             actions.append(("Standings", show_standings))
             actions.append(("Players", players_menu))
+            actions.append(("Export as a web page", export_web_page))
         else:
             actions.append(("Players", players_menu))
             actions.append(("Seeding", seeding_menu))

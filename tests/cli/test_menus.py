@@ -14,7 +14,7 @@ def names(players):
     return [player.name.text for player in players]
 
 
-def test_a_round_robin_from_new_tournament_to_saved_standings(script, folder):
+def test_a_round_robin_from_new_tournament_to_saved_and_exported(script, folder):
     console = script(
         "1", "Friday Smash Night", "2",  # new round robin
         "1", "1", "Ana", "1500", "Ben", "1800", "Cleo", "", "", "0",  # players
@@ -22,7 +22,8 @@ def test_a_round_robin_from_new_tournament_to_saved_standings(script, folder):
         "3", "y",  # start
         "1", "1", "1", "2-1", "0",  # enter a result
         "2", "",  # standings
-        "4", "",  # save under the suggested name
+        "4", "",  # export under the suggested name
+        "5", "",  # save under the suggested name
         "0",  # quit
     )  # fmt: skip
     session = TournamentSession()
@@ -34,6 +35,18 @@ def test_a_round_robin_from_new_tournament_to_saved_standings(script, folder):
     assert f"Saved to {saved}." in console.screen
     assert console.lines[-1] == "Goodbye."
     assert saved.exists()
+    assert (folder / "Friday Smash Night.html").exists()
+
+
+def test_us_11_export_is_on_the_main_menu_only_after_the_start(script, league):
+    console = script("0", "2")  # quit, discard the changes
+    run(console, league)
+    assert "Export as a web page" not in console.screen
+    league.seed_by_rating()
+    league.start()
+    console = script("0", "2")
+    run(console, league)
+    assert "4. Export as a web page" in console.screen
 
 
 def test_a_choice_that_isnt_on_the_menu_is_asked_again(script):

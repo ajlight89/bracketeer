@@ -261,3 +261,28 @@ def test_us_07_7_clearing_a_result_makes_the_match_unplayed(cup):
     cup.record_score(match.id, 2, 0)
     cup.clear_result(match.id)
     assert match.result is None
+
+
+# Exporting a web page (US-11)
+
+
+def test_us_11_1_export_writes_a_utf_8_web_page(session, tmp_path):
+    session.rename_player(1, "Zoë")
+    session.seed_by_rating()
+    session.start()
+    session.save(tmp_path / "friday.bracketeer")
+    page = tmp_path / "friday.html"
+    session.export_web_page(page)
+    assert "Zoë" in page.read_text(encoding="utf-8")
+    assert not session.has_unsaved_changes  # exporting changes nothing
+
+
+def test_exporting_before_the_start_is_refused(session, tmp_path):
+    with pytest.raises(ActionError, match="Start the tournament before exporting"):
+        session.export_web_page(tmp_path / "friday.html")
+    assert not (tmp_path / "friday.html").exists()
+
+
+def test_a_page_that_cant_be_written_raises_a_plain_message(cup, tmp_path):
+    with pytest.raises(ActionError, match="Couldn't export to"):
+        cup.export_web_page(tmp_path / "missing" / "cup.html")

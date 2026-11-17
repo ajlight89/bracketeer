@@ -19,6 +19,7 @@ Final project for CPTR 345 Software Engineering, Fall 2026.
 - Record match results, including forfeits
 - Standings with tiebreakers
 - Save a tournament to a file and open it again
+- Export a tournament as a single web page to share with the players
 - A single Windows `.exe`, so Python doesn't need to be installed
 
 ## Documentation
@@ -56,7 +57,7 @@ python -m bracketeer
 
 Choose each action by typing its number and pressing Enter. Tournaments are saved
 as `.bracketeer` files in a `Bracketeer` folder in your Documents, and Open lists
-them for you to choose from.
+them for you to choose from. Exported web pages (`.html`) go in the same folder.
 
 ## Running the tests
 

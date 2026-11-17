@@ -169,7 +169,7 @@ As an organizer, I want to save a tournament as a file on my computer so that I 
 
 As an organizer, I want to export a tournament as a web page so that I can share the bracket and standings with players.
 
-1. **Given** a tournament, **when** I export it and choose where to save it, **then** a single HTML file is created there, showing the rounds, results, and standings.
+1. **Given** a started tournament, **when** I export it, **then** a single HTML file is created in my Bracketeer folder, showing the rounds, results, and standings.
 2. **Given** an exported file, **when** I open it in a web browser without an internet connection, **then** it displays correctly (NFR-PO-3).
 3. **Given** a player named `<script>alert(1)</script>`, **when** I export and open the page, **then** the name appears as plain text, and no script runs (NFR-SE-2).
 4. **Given** I choose Export, **then** I'm asked for a file name, and the page is written only to my Bracketeer folder under that name (NFR-SE-5).

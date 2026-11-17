@@ -57,8 +57,6 @@ The NFRs are grouped by the quality characteristics of the ISO/IEC 25010 product
 | NFR-MA-2 | Every testable acceptance criterion of a Must story is covered by an automated test that names the story and criterion (for example, `US-01 #2`). | Review of the test names against the story list before each release |
 | NFR-MA-3 | `ruff check` and `ruff format --check` pass on every pull request.                                                                           | GitHub Actions                                                      |
 
-NFR-SE-2 and NFR-PO-3 apply only if web export (US-11) is built.
-
 ## Sources
 
 - ISO/IEC 25010 product quality model: https://iso25000.com/index.php/en/iso-25000-standards/iso-25010

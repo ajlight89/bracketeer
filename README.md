@@ -20,7 +20,9 @@ Final project for CPTR 345 Software Engineering, Fall 2026.
 - Standings with tiebreakers
 - Save a tournament to a file and open it again
 - Export a tournament as a single web page to share with the players
-- A single Windows `.exe`, so Python doesn't need to be installed
+- A single Windows `.exe`, so Python doesn't need to be installed (it hasn't
+  been tested on a computer without Python; if it doesn't start, install Python
+  and run Bracketeer from source as described below)
 
 ## Documentation
 
@@ -70,6 +72,18 @@ ruff format --check .
 ```
 
 GitHub Actions runs the same checks on every pull request.
+
+## Sample tournaments
+
+To try Bracketeer without typing a tournament in, create the sample tournaments
+used for the report's screenshots:
+
+```powershell
+python scripts\make_demo_data.py
+```
+
+They are written to your Bracketeer folder (`Documents\Bracketeer`). Files that
+already exist are kept unless you add `--replace`.
 
 ## How the project is run
 

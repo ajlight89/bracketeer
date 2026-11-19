@@ -8,7 +8,7 @@ and no internet connection.
 
 Final project for CPTR 345 Software Engineering, Fall 2026.
 
-> **Status:** in development. The first release is planned for late November 2026.
+> **Status:** version 1.0.0, released November 2026.
 
 ## Features (v1.0)
 
@@ -23,6 +23,18 @@ Final project for CPTR 345 Software Engineering, Fall 2026.
 - A single Windows `.exe`, so Python doesn't need to be installed (it hasn't
   been tested on a computer without Python; if it doesn't start, install Python
   and run Bracketeer from source as described below)
+
+## Download
+
+1. Open the repository's **Releases** page and choose the latest release.
+2. Under **Assets**, download `Bracketeer.exe`.
+3. Double-click `Bracketeer.exe` to start it.
+
+Bracketeer isn't signed with a code-signing certificate, so Windows SmartScreen
+may show "Windows protected your PC" the first time you run it. Choose
+**More info**, then **Run anyway**. The `.exe` hasn't been tested on a computer
+without Python; if it doesn't start, install Python and run Bracketeer from
+source as described below.
 
 ## Documentation
 

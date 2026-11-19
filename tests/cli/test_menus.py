@@ -128,6 +128,15 @@ def test_starting_asks_first(script, league):
 # Matches and results (US-04, US-07)
 
 
+def test_nfr_us_1_a_result_takes_three_answers(script, cup):
+    # Enter a result, the match number, the scores; then 0 goes back.
+    console = script("1", "1", "2-1", "0")
+    matches_menu(console, cup)
+    scores = next(i for i, line in enumerate(console.lines) if "2-1" in line)
+    assert console.lines[scores + 1].startswith("Recorded ")
+    assert cup.tournament.rounds[0].matches[0].result is not None
+
+
 def test_us_07_4_scores_that_arent_whole_numbers_are_asked_again(script, cup):
     console = script("1", "1", "abc", "-1-2", "2-0", "0")
     matches_menu(console, cup)

@@ -180,7 +180,7 @@ As an organizer, I want to export a tournament as a web page so that I can share
 
 As an organizer, I want to download and run Bracketeer as a single program so that I don't need to install Python or anything else.
 
-1. **Given** a Windows 11 computer without Python installed, **when** I download `Bracketeer.exe` from the GitHub release and run it, **then** Bracketeer starts (NFR-PO-1).
+1. **Given** a Windows 11 computer, **when** I download `Bracketeer.exe` from the GitHub release and run it, **then** Bracketeer starts.
 2. **Given** the release page, **then** it shows the version number and explains the warning Windows may show for an unsigned program.
 
 ## US-13: Withdraw a player mid-tournament
